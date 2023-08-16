@@ -1,0 +1,72 @@
+1.Create new Project 
+2.asp.net core web app(Model-View-Controller)
+3.Disable configure for http -->enable docker and enable Do not use top-level statements.
+4.Right click on App_name and click on Manage Nuget Packages-->Go to Browse-->Install 7 Depenedences
+	--> Search for entity.
+	i.Microsoft.EntityFrameworkCore
+	ii.Microsoft.EntityFrameworkCore.Relational.
+	iii.Microsoft.EntityFrameworkCore.SqlServer.
+	iv.Microsoft.EntityFrameworkCore.Tools
+	--> Search for Mysql 
+	v.Pomelo
+	vi.Mysql.EntityFramework
+	--> Search for design
+	vii.Microsoft.VisualStudio.Web.CodeGeneration.Design
+
+5.Right Click on App_name and Add --> new Folder-->name the folder with name Data -->and right click on Data folder-->create new item-->new class MyDbContext
+6. class MyDbContext:Dbcontext
+{
+	public MyDbContext(DbContextOptions<MyDbContext> options) : base(options) { }
+}
+7.Add new Movie Class -->Entity -->
+	Annotation :: 
+		[key]
+		id
+		[required(errormessage="file not found")]
+		Name
+	
+8.In Appsettings.json 
+	 "ConnectionStrings": {
+        "DefaultConnection": "server=localhost; database=Dotnet; user=root; password=root@123; port=3306"
+    },
+
+9. In program.cs ::
+	var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddDbContext<MyDbContext>(options =>
+            {
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));                
+            });
+10.Add Code in DbCOntext ::
+	public DbSet<Hospital> hospitals { get; set; }
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder
+                .Entity<Hospital>()
+                .Property(c => c.hospitaltype)
+                .HasConversion(new EnumToStringConverter<Types>());
+        }
+
+11.Go to Tools-->Nuget package manager-->package manager console-->
+	Two commands :: 
+	1. add-migration i
+	2. update-database
+
+your tables will get generated 
+12.Add new Controller--> MVC Controller with view,using Entity Framework 
+	Model class-->select entity name 
+	DbContext class-->MyDbContext
+13.Go to views-->shared -->_layout.cshtml-->and add 
+	<li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Hospitals" asp-action="index">Manage</a>
+        </li>
+	
+14.Go to Views--> EntitynameFolder-->create.cshtml-->
+	in select tag add options tag to add the Enum Attributes
+	E.g ::  
+		<option>CANCER</option>
+         	<option>GENERAL</option>
+         	<option>CIVIL</option>
+	
+15.select http and run the Program.
+
